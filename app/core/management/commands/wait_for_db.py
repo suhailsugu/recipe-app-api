@@ -1,9 +1,7 @@
 from typing import Any
 from django.core.management.base import BaseCommand
 from psycopg2 import OperationalError as Psycopg2Error
-
 import time
-from django.core.management import call_command
 from django.db.utils import OperationalError
 
 class Command(BaseCommand):
