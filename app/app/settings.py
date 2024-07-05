@@ -39,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core'
+    'core',
+    'rest_framework',
+    'drf_spectacular',
+
 ]
 
 MIDDLEWARE = [
@@ -100,8 +103,8 @@ DATABASES = {
         'NAME': 'devdb',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        'HOST': 'db',  # or your database host
-        'PORT': '5432',       # default port for PostgreSQL
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
@@ -146,3 +149,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'core.User'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS' : 'drf_spectacular.openapi.AutoSchema'
+}
