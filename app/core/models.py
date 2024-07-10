@@ -6,6 +6,16 @@ from django.contrib.auth.models import (
     BaseUserManager
 )
 from django.conf import settings
+import os,uuid
+
+
+
+
+def recipe_image_file_path(instance,filename):
+    ext = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+    return os.path.join('uploads','recipe',filename)
+
 
 class UserManager(BaseUserManager):
     """Managers for the User Model"""
@@ -56,6 +66,7 @@ class Recipe(models.Model):
     link            = models.CharField(max_length=255,blank=True)
     tags            = models.ManyToManyField('Tag')
     ingredient      = models.ManyToManyField('Ingredient')
+    image           = models.ImageField(null=True,upload_to=recipe_image_file_path)
 
 
     def __str__(self):
