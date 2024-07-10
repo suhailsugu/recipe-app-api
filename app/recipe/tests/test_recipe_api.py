@@ -74,6 +74,7 @@ class PrivateRecipeAPITests(TestCase):
 
         self.client.force_authenticate(self.user)
 
+
     def test_retrieve_recipe(self):
         create_recipe(user=self.user)
         create_recipe(user=self.user)
@@ -86,6 +87,7 @@ class PrivateRecipeAPITests(TestCase):
 
         self.assertEqual(res.status_code,status.HTTP_200_OK)
         self.assertEqual(res.data,serializer.data)
+
 
     def test_recipe_list_limited_user(self):
         other_user = create_user(email='other@example.com', password='test123')
@@ -115,6 +117,7 @@ class PrivateRecipeAPITests(TestCase):
         serializer    = RecipeDetailSerializer(recipe)
 
         self.assertEqual(res.data,serializer.data)
+
 
     def test_create_recipe(self):
 
@@ -155,6 +158,7 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(recipe.link, original_link)
         self.assertEqual(recipe.user, self.user)
 
+
     def test_full_update(self):
         """Test full update of recipe."""
         recipe = create_recipe(
@@ -180,6 +184,7 @@ class PrivateRecipeAPITests(TestCase):
             self.assertEqual(getattr(recipe, k), v)
         self.assertEqual(recipe.user, self.user)
 
+
     def test_update_user_returns_error(self):
         """Test changing the recipe user results in an error."""
         new_user = create_user(email='user2@example.com', password='test123')
@@ -191,6 +196,7 @@ class PrivateRecipeAPITests(TestCase):
 
         recipe.refresh_from_db()
         self.assertEqual(recipe.user, self.user)
+
 
     def test_delete_recipe(self):
         """Test deleting a recipe successful."""
@@ -214,6 +220,7 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Recipe.objects.filter(id=recipe.id).exists())
 
+
     def test_create_recipe_with_new_tags(self):
         """Test creating a recipe with new tags."""
         payload = {
@@ -235,6 +242,7 @@ class PrivateRecipeAPITests(TestCase):
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
+
 
     def test_create_recipe_with_existing_tags(self):
         """Test creating a recipe with existing tag."""
@@ -259,6 +267,7 @@ class PrivateRecipeAPITests(TestCase):
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
+
 
     def test_create_tag_on_update(self):
         recipe = create_recipe(user=self.user)
@@ -287,6 +296,7 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(res.status_code,status.HTTP_200_OK)
         self.assertIn(tag_lunch,recipe.tags.all())
         self.assertNotIn(tag_breakfast,recipe.tags.all())
+
 
     def test_clear_recipe__tag(self):
         tag_breakfast = Tag.objects.create(user=self.user,name='Breakfast')
@@ -324,6 +334,7 @@ class PrivateRecipeAPITests(TestCase):
             ).exists()
             self.assertTrue(exists)
 
+
     def test_create_recipe_with_existing_ingreidents(self):
         """Test creating a recipe with existing Ingredient."""
         ingredient1 = Ingredient.objects.create(user=self.user, name='Chilly')
@@ -348,6 +359,7 @@ class PrivateRecipeAPITests(TestCase):
             ).exists()
             self.assertTrue(exists)
 
+
     def test_create_ingredient_on_update(self):
 
         recipe = create_recipe(user=self.user)
@@ -359,8 +371,6 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(res.status_code,status.HTTP_200_OK)
         new_ingredient = Ingredient.objects.get(user=self.user,name='Limes')
         self.assertIn(new_ingredient,recipe.ingredient.all())
-
-
 
 
     def test_update_recipe_assign_ingredient(self):
@@ -391,6 +401,65 @@ class PrivateRecipeAPITests(TestCase):
 
         self.assertEqual(res.status_code,status.HTTP_200_OK)
         self.assertEqual(recipe.ingredient.count(),0)
+
+
+    def test_filter_by_tags(self):
+        r1 = create_recipe(user=self.user,title='Thai')
+        r2 = create_recipe(user=self.user,title='Augbernie')
+        tag1 = Tag.objects.create(user=self.user,name='Vegan')
+        tag2 = Tag.objects.create(user=self.user,name='Vegetarian')
+        r1.tags.add(tag1)
+        r2.tags.add(tag2)
+
+        r3 = create_recipe(user=self.user,title='Fish and Chips')
+
+        params = {'tags':f'{tag1.id},{tag2.id}'}
+        res = self.client.get(RECIPES_URL,params)
+
+        s1 = RecipeSerializer(r1)
+        s2 = RecipeSerializer(r2)
+        s3 = RecipeSerializer(r3)
+
+        self.assertIn(s1.data,res.data)
+        self.assertIn(s2.data,res.data)
+        self.assertNotIn(s3.data,res.data)
+
+    def test_filter_by_ingredients(self):
+        r1 = create_recipe(user=self.user,title='Thai')
+        r2 = create_recipe(user=self.user,title='Augbernie')
+
+        ing1 = Ingredient.objects.create(user=self.user,name='chilli')
+        ing2 = Ingredient.objects.create(user=self.user,name='salt')
+
+        r1.ingredient.add(ing1)
+        r2.ingredient.add(ing2)
+
+        r3 = create_recipe(user=self.user,title='Fish and chips')
+
+        params = {'ingredients':f'{ing1.id},{ing2.id}'}
+        res = self.client.get(RECIPES_URL,params)
+
+        s1 = RecipeSerializer(r1)
+        s2 = RecipeSerializer(r2)
+        s3 = RecipeSerializer(r3)
+
+        self.assertIn(s1.data,res.data)
+        self.assertIn(s2.data,res.data)
+        self.assertNotIn(s3.data,res.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

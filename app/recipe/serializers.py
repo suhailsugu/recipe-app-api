@@ -27,13 +27,13 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     tags          = TagSerializer(many=True,required=False)
-    ingredients    = IngredientSerializer(many=True,required=False)
+    ingredient    = IngredientSerializer(many=True,required=False)
 
 
 
     class Meta:
         model = Recipe
-        fields = ['id','title','time_minutes','price','link','tags','ingredients']
+        fields = ['id','title','time_minutes','price','link','tags','ingredient']
         read_only_fields = ['id']
 
     def _get_or_create_tags(self,tags,recipe):
@@ -53,8 +53,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             recipe.ingredient.add(ingredient_obj)
 
     def create(self,validated_data):
+
         tags          = validated_data.pop('tags',[])
-        ingredients    = validated_data.pop('ingredients',[])
+        ingredients    = validated_data.pop('ingredient',[])
+
 
         recipe = Recipe.objects.create(**validated_data)
 
@@ -66,7 +68,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self,instance,validated_data):
         tags = validated_data.pop('tags',[])
-        ingredients    = validated_data.pop('ingredients',[])
+        ingredients    = validated_data.pop('ingredient',[])
 
         if tags is not None:
             instance.tags.clear()
