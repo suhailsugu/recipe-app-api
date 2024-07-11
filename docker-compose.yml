@@ -21,6 +21,8 @@ services:
       - DB_NAME=devdb
       - DB_USER=postgres
       - DB_PASS=root
+      - DEBUG=1
+
     depends_on:
       - db
 

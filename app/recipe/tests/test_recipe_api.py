@@ -318,7 +318,7 @@ class PrivateRecipeAPITests(TestCase):
             'title': 'Thai Prawn Curry',
             'time_minutes': 30,
             'price': Decimal('2.50'),
-            'ingredients': [{'name': 'Cauliflower'}, {'name': 'Salt'}],
+            'ingredient': [{'name': 'Cauliflower'}, {'name': 'Salt'}],
         }
         res = self.client.post(RECIPES_URL, payload, format='json')
 
@@ -327,7 +327,7 @@ class PrivateRecipeAPITests(TestCase):
         self.assertEqual(recipes.count(), 1)
         recipe = recipes[0]
         self.assertEqual(recipe.ingredient.count(), 2)
-        for ingredient in payload['ingredients']:
+        for ingredient in payload['ingredient']:
             exists = recipe.ingredient.filter(
                 name=ingredient['name'],
                 user=self.user,
@@ -342,7 +342,7 @@ class PrivateRecipeAPITests(TestCase):
             'title': 'Pongal',
             'time_minutes': 60,
             'price': Decimal('4.50'),
-            'ingredients': [{'name': 'Chilly'}, {'name': 'Breakfast'}],
+            'ingredient': [{'name': 'Chilly'}, {'name': 'Breakfast'}],
         }
         res = self.client.post(RECIPES_URL, payload, format='json')
 
@@ -352,7 +352,7 @@ class PrivateRecipeAPITests(TestCase):
         recipe = recipes[0]
         self.assertEqual(recipe.ingredient.count(), 2)
         self.assertIn(ingredient1, recipe.ingredient.all())
-        for ingredient in payload['ingredients']:
+        for ingredient in payload['ingredient']:
             exists = recipe.ingredient.filter(
                 name=ingredient['name'],
                 user=self.user,
@@ -364,7 +364,7 @@ class PrivateRecipeAPITests(TestCase):
 
         recipe = create_recipe(user=self.user)
 
-        payload = {'ingredients':[{'name':'Limes'}]}
+        payload = {'ingredient':[{'name':'Limes'}]}
         url = detail_url(recipe.id)
         res= self.client.patch(url,payload,format='json')
 
@@ -379,10 +379,11 @@ class PrivateRecipeAPITests(TestCase):
         recipe.ingredient.add(ingredient1)
 
         ingredient2 = Ingredient.objects.create(user=self.user,name='Lunch')
-        payload = {'ingredients':[{'name':'Lunch'}]}
+        payload = {'ingredient':[{'name':'Lunch'}]}
         url = detail_url(recipe.id)
 
         res =self.client.patch(url,payload,format='json')
+
 
         self.assertEqual(res.status_code,status.HTTP_200_OK)
         self.assertIn(ingredient2,recipe.ingredient.all())
@@ -394,7 +395,7 @@ class PrivateRecipeAPITests(TestCase):
         recipe = create_recipe(user=self.user)
         recipe.ingredient.add(ingredient1)
 
-        payload = {'ingredients':[]}
+        payload = {'ingredient':[]}
         url = detail_url(recipe.id)
 
         res =self.client.patch(url,payload,format='json')
