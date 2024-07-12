@@ -1,4 +1,4 @@
-version: '3.10'
+version: "3.9"
 
 services:
   app:
@@ -11,7 +11,6 @@ services:
     volumes:
       - ./app:/app
       - dev-static-data:/vol/web
-
     command: >
       sh -c "python manage.py wait_for_db &&
              python manage.py migrate &&
@@ -19,24 +18,21 @@ services:
     environment:
       - DB_HOST=db
       - DB_NAME=devdb
-      - DB_USER=postgres
-      - DB_PASS=root
+      - DB_USER=devuser
+      - DB_PASS=changeme
       - DEBUG=1
-
     depends_on:
       - db
 
-
   db:
-    image: postgres:16.3-alpine3.20
+    image: postgres:13-alpine
     volumes:
       - dev-db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=devdb
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=root
-
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
 
 volumes:
-  dev-db-data :
+  dev-db-data:
   dev-static-data:
